@@ -1,0 +1,457 @@
+---
+title: "Intro to R Tidyverse - Notebook"
+output: html_notebook
+---
+```{r}
+library(dplyr)
+install.packages("tidyverse")
+
+
+x <- 4 #numerical
+# x = 4
+
+y <- TRUE 
+#logical
+z <- "Kevin" 
+#character
+
+x
+
+x*2
+
+x+4
+
+mode(mtcars)
+class(mtcars)
+
+mode(iris)
+class(iris)
+
+library(magrittr)
+
+install.packages("dplyr")
+
+# explore dataset
+
+head(iris) #first values
+tail(iris) #last values
+names(iris) #names of columns and rows
+dim(iris) #dimensions
+summary(iris) #stats of dataset
+colnames(iris) #column names
+
+summary(tail(iris))
+
+iris %>% summary
+# pipe operator: output da primeira funcao serve de input para segunda funcao
+
+
+iris %>%  head(5)
+
+iris %>%  head(5) %>% summary %>% class
+
+
+library(dplyr)
+
+#dplyr - hadley wickham
+#important commands filter, arrange, select
+
+filter(iris)
+
+arrange(head(iris, 10))
+
+Setosa = filter(iris, Sepal.Width>3 || filter(iris, Species=="setosa"))
+
+filter(iris, Species!="setosa",Sepal.Width>3)
+
+#ver com o pipe operator
+
+
+
+
+
+
+
+Setosa
+
+head(mtcars)
+
+select(mtcars, 1:4)
+
+select(mtcars, 1:4,am)
+
+select(mtcars, -am) #minus/except column am
+
+select(mtcars, starts_with("m")) #column starting with
+
+select(mtcars, ends_with("q"))
+
+select(mtcars, contains("q"))
+
+select(mtcars, contains("q"), 1:3) #precedence order
+
+iris2 = group_by(iris, Species) #same as iris %>% group_by(Species)
+mode(iris2)
+
+class(iris2)
+
+#tdl_df tbl for dev
+
+summarize(iris2, mean(Sepal.Width))
+
+iris2
+
+summarize(iris2, sd(Sepal.Width))
+
+#median()
+#sd() ->std dev
+#var() ->variance
+
+mtcars %>% group_by(vs,am) %>% summarize(mean(disp))
+
+airquality
+
+airquality %>% colnames
+
+airquality %>% summary
+
+airquality %>% group_by(Month) %>% summarize(mean(Ozone))
+#NAs - no values
+
+#how NAs affect the dataset
+x = c(1, 2, 10, NA)
+mean(x)
+
+help(mean)
+
+mean(x, na.rm = TRUE)
+
+airquality %>% group_by(Month) %>% summarize(mean(Ozone, na.rm=TRUE))
+
+#filter + select -> row + column
+#group_by + summarize
+
+arrange(mtcars, am)
+#sort by am
+
+#two level of ordering arrange(mtcars, am, vs)
+#invert arrange(mtcars, -am)
+#invert arrange(mtcars, desc(am))
+
+
+#calculations
+#add column based on other values
+mutate(mtcars, ratio = mpg/wt)
+
+mt2 = mutate(mtcars, ratio = mpg/wt)
+
+help(mutate)
+
+help(select)
+
+select(mt2, -mpg, -wt, -ratio, everything())
+#ordenar com os valores mpg rt e ratio no fim
+
+
+
+```
+summarise can be useful to give a quick preview of the data, particularly when the datasets are large
+```{r}
+library(ggplot2)
+
+data(diamonds)
+
+dim(diamonds)
+
+head(diamonds)
+
+diamonds %>% arrange(-price, cut) %>% select(price, cut) %>% arrange(-price)
+
+```
+using summarise to find mean price of diamonds in order of another of their properties (carat, cut, color...)
+```{r}
+
+library(dplyr)
+diamonds %>% summary
+# to find the headers of this dataset - carat, cut, color, clarity
+# ex TODO: which property is a better predictor of price?
+
+diamonds %>% select(carat, price) %>% summary
+
+MeanPrice = summarise(group_by(diamonds, carat), mean(price))
+MeanPrice
+```
+maybe summarize carat values - group into intervals
+```{r}
+help("group_by")
+
+```
+
+
+organize/arrange table by mean price - descending
+```{r}
+
+MeanPrice %>% arrange(desc(Mean))
+
+```
+T test
+```{r}
+data(smiths)
+
+x = 1:99
+
+t.test(x)
+
+mean(x)
+ttest=t.test(x, mu=4)
+
+class(ttest)
+mode(ttest)
+names(ttest)
+
+summary(ttest)
+
+ttest$p.value
+
+mtcars$disp
+
+names(iris)
+
+iris$Species
+
+table(iris$Species) #freq table
+
+table(iris$Species, iris$Petal.Width) #cross tabulation
+
+#pearson chi squared test
+chisq.test(mtcars$am, mtcars$vs)
+
+library(broom)
+
+install.packages("broom")
+
+library(broom) #tidy up data!
+
+tidy(ttest)
+
+1:9
+
+sample(1:9, 2) #x rolls of the dice, numbers 1 to 9
+#it's a shuffler, never gives repeated values
+
+
+#if rolls of the dice are larger than length...
+sample(1:3, 4)
+
+#fixed by...
+sample(1:3, 4, replace=TRUE)
+
+sum(sample(1:3, 4, replace=TRUE))
+
+x1 <- 1:20
+x2 <- sample(1:6, 20, replace=TRUE)
+x3 <- c("A", "B", "C", "D")
+
+x1
+x2
+x3
+
+x4 <- rep(x3) #represent
+x4
+
+x4 <- rep(x3, each=2)
+x4
+
+x4 <- rep(x3, 5)
+x4
+
+
+
+x5 <-rnorm(20,100,10) #nr of results, mean, std dev
+x5
+
+x5 <- round(rnorm(20,100,10))
+x5
+
+x5 > 105 #evaluates if true or false
+
+x6 <- x5 > 105
+mean(x6) #mean of true and false, mean of zeros and ones...
+
+#to find out how many are TRUE (x6 <- x5 > 105)...
+sum(x6)
+
+dataframe1 <- data.frame(ID = 101:120, x1, x2, x3)
+dataframe2 <- data.frame(ID = 104:123, x4, x5, x6)
+dataframe2
+dataframe1
+
+#join two tables (with conflicting IDs)
+help(join)
+
+inner_join(dataframe1, dataframe2) #intersection - only rows with matching keys in both x and y
+
+left_join(dataframe1, dataframe2) #all rows in x plus y rows with matching keys in both x and y
+
+full_join(dataframe1, dataframe2) #all of it
+
+anti_join(dataframe1, dataframe2)#reverse full join, diagnose what's empty
+
+anti_join(dataframe2, dataframe1) #what's left behind from df2
+```
+
+
+
+
+
+https://github.com/RWorkshop/workshopdatasets/blob/master/cappun.csv dataset url
+
+Choose Raw version of csv values
+
+urlfile<-'https://github.com/RWorkshop/workshopdatasets/blob/master/cappun.csv'
+idaho<-read.csv(url(urlfile)) to import dataset
+
+```{r}
+urlfile<-'https://raw.githubusercontent.com/RWorkshop/workshopdatasets/master/cappun.csv'
+cappun<-read.csv(url(urlfile))
+```
+```{r}
+library(dplyr)
+cappun %>% names 
+cappun$age %>% mean
+```
+Grammar Graphics Plotting
+```{r}
+
+library(ggplot2)
+
+cappun$age %>% plot
+```
+
+Let's graph some real data
+
+aes() is aesthetics 
+So far we're only setting up our canvas
+
+```{r}
+canvas = ggplot(aes(x=Sepal.Length, y=Sepal.Width), data=iris)
+canvas
+```
+turn this into a scatter plot
+```{r}
+canvas+geom_point()
+```
+```{r}
+help(group)
+```
+
+
+New chunk - graph experiment w/ boxplots
+```{r}
+help("geom_boxplot")
+canvas+
+  geom_boxplot(aes(group = cut_width(Sepal.Length, 7)), varwidth = TRUE)
+```
+RGB colours, default max value is 1, so to use the 255 scale change to maxColorValue = 255, output value is a hex 
+```{r}
+help(rgb)
+testcor <- rgb(1, 0, 100, names = paste("testcolor"), maxColorValue = 255)
+testcor
+
+```
+
+group = cut_width, cut_interval, cut_number... how to "cut" or group groups of data
+
+```{r}
+test <- rgb(170, 100, 100, names = paste("testcolor"), maxColorValue = 255)
+test
+
+canvas+
+  geom_boxplot(aes(group = cut_interval(Sepal.Length, 7)), outlier.shape = 5, outlier.colour = test, fill = test)
+```
+
+
+Histogram (single variable, x)
+```{r}
+canvas2 = ggplot(aes(x=Sepal.Length), data=iris)
+canvas2+geom_histogram()
+```
+	
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+```{r}
+help("stat_bin")
+canvasingle = ggplot(aes(x=Sepal.Length), data=iris)
+canvasingle+geom_histogram(binwidth = )
+```
+
+
+geom needs to suit the data or it won't work
+
+```{r}
+canvas2+geom_histogram()
++facet_wrap("Species")
+```
+Facet Wrap allows us to divide the display by different categories
+```{r}
+cars = ggplot(aes(x=mpg, y=wt), data=mtcars)
+cars+geom_point()+facet_wrap("vs")+stat_smooth()
+```
+More graphical methods
+```{r}
+cars+geom_point()+facet_wrap("vs")+stat_smooth(method = "lm")
+```
+A plot is made of multiple layers
+Layers consist of data, a set of mappings btwn variables and (?), a geometric object and statistical transformations
+
+Add a trend line
+
+```{r}
+cars = ggplot(aes(x=mpg, y=wt), data=mtcars)
+cars+geom_line()
+```
+
+
+```{r}
+carcanvas = ggplot(aes(x=wt, y=mpg, colour=factor(am)), data=mtcars)
+carcanvas+geom_line()+facet_wrap("vs")+stat_smooth(method = "lm")
+```
+
+
+univariate
+bivariate
+multivariate
+
+```{r}
+dcanvas = ggplot(aes(x=carat, y=price, colour=factor(cut)), data=diamonds)
+dcanvas+geom_point()+stat_smooth()
+```
+
+```{r}
+dcanvas = ggplot(aes(x=carat, y=price, colour=cut), data=diamonds)
+dcanvas+geom_point()
+```
+Themes
+```{r}
+help("theme")
+dcanvas+geom_point()+theme_minimal()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
